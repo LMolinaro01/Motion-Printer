@@ -15,6 +15,7 @@ MotionPrinter é um projeto de câmera de segurança inteligente que combina Ard
 ## Tecnologias Utilizadas
 - Arduino
 - ESP32
+- Câmera OV2640 2MP
 - Python
 - WhatsApp API
 
