@@ -1,5 +1,3 @@
-//Tira apenas uma foto
-
 #include "esp_camera.h"
 #include "Arduino.h"
 #include <base64.h>
@@ -23,12 +21,10 @@
 #define HREF_GPIO_NUM     23
 #define PCLK_GPIO_NUM     22
 
-
 void setup() {
   Serial.begin(115200);
   pinMode(LED, OUTPUT);
   
-
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
   config.ledc_timer = LEDC_TIMER_0;
@@ -49,10 +45,10 @@ void setup() {
   config.pin_pwdn = PWDN_GPIO_NUM;
   config.pin_reset = RESET_GPIO_NUM;
   config.xclk_freq_hz = 20000000;
-  config.pixel_format = PIXFORMAT_JPEG; 
+  config.pixel_format = PIXFORMAT_JPEG;
 
   if(psramFound()){
-    config.frame_size = FRAMESIZE_CIF; // FRAMESIZE_ + QVGA|CIF|VGA|SVGA|XGA|SXGA|UXGA
+    config.frame_size = FRAMESIZE_CIF; 
     config.jpeg_quality = 10;
     config.fb_count = 2;
   } else {
@@ -67,24 +63,40 @@ void setup() {
     Serial.printf("Camera init failed with error 0x%x", err);
     return;
   }
-
-  camera_fb_t * fb = NULL;
-  digitalWrite(LED, HIGH);
-  delay(500);
-  
-  // Take Picture with Camera
-  fb = esp_camera_fb_get();  
-  if(!fb) {
-    Serial.println("Camera capture failed");
-    return;
-  }
-  else{
-  String base64data = base64::encode(fb->buf, fb->len);
-  Serial.println(base64data);
-  Serial.println("Success");}
-
-  esp_camera_fb_return(fb);
-  digitalWrite(LED, LOW);
 }
 
-void loop() {}
+void send_data_in_chunks(String data) {
+  const int chunk_size = 100;  // Tamanho dos pedaços
+  for (unsigned int i = 0; i < data.length(); i += chunk_size) {
+    String part = data.substring(i, i + chunk_size);
+    Serial.println(part);
+    delay(50);  // Dê tempo para o receptor processar
+  }
+}
+
+void loop() {
+  if (Serial.available()) {
+    char command = Serial.read();
+    if (command == 'a') {  // Esperando comando do Python
+      digitalWrite(LED, HIGH);
+      delay(500);
+
+      // Capturar Imagem
+      camera_fb_t * fb = esp_camera_fb_get();
+      if (!fb) {
+        Serial.println("Camera capture failed");
+        digitalWrite(LED, LOW);
+        return;
+      }
+
+      // Converter para base64
+      String base64data = base64::encode(fb->buf, fb->len);
+      esp_camera_fb_return(fb);
+      digitalWrite(LED, LOW);
+
+      // Enviar a imagem em pedaços
+      send_data_in_chunks(base64data);
+      Serial.println("Success");
+    }
+  }
+}
