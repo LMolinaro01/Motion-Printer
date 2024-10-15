@@ -10,11 +10,12 @@ import threading
 import os
 
 ser = None
-captura_ativa = False  # Controla se a captura está ativa
-pasta_salvar = ""  # Pasta onde as imagens serão salvas
+captura_ativa = False 
+pasta_salvar = ""
 preview_label = None
 btn_salvar = None
 btn_tirar_novamente = None
+btn_sair = None
 
 def conectar_arduino():
     global ser
@@ -37,7 +38,7 @@ def tentar_conectar_novamente():
             app.quit()
 
 def mostrar_preview(image_data):
-    global preview_label, btn_salvar, btn_tirar_novamente
+    global preview_label, btn_salvar, btn_tirar_novamente, btn_sair
     
     image = Image.open(io.BytesIO(image_data))
     photo = ImageTk.PhotoImage(image)
@@ -57,6 +58,11 @@ def mostrar_preview(image_data):
     if btn_tirar_novamente is None:
         btn_tirar_novamente = ctk.CTkButton(app, text="Tirar Novamente", command=tirar_foto_unica)
         btn_tirar_novamente.pack(padx=50, pady=10, fill='x')
+
+    if btn_sair is None:
+
+        btn_sair = ctk.CTkButton(app, text = "Sair do Programa", command = app.destroy)
+        btn_sair.pack(pady = 15)
 
 def confirmar_salvar(image):
     file_path = filedialog.asksaveasfilename(defaultextension=".jpg", 
@@ -85,8 +91,8 @@ def tirar_foto():
     global ser
     if ser and ser.is_open:
         try:
-            ser.write(b't')  # Envia o comando para o Arduino tirar a foto
-            time.sleep(1)  # Ajuste no tempo para garantir que a imagem seja recebida
+            ser.write(b't')
+            time.sleep(1) 
             
             base64_data = ""
             while True:
@@ -158,7 +164,7 @@ def abrir_janela_temporizador():
 
     # Botão para voltar para a janela principal
     btn_voltar = ctk.CTkButton(janela_temporizador, text="Voltar", command=janela_temporizador.destroy)
-    btn_voltar.pack(padx=50, pady=10, fill='x')
+    btn_voltar.pack(pady=15)
 
 def iniciar_captura_temporizador():
     global captura_ativa
@@ -185,7 +191,7 @@ ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
 
 app = ctk.CTk()
-app.geometry("500x600")
+app.geometry("500x650")
 app.title("SnapLink")
 
 tentar_conectar_novamente()
