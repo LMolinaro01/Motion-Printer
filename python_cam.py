@@ -60,9 +60,8 @@ def mostrar_preview(image_data):
         btn_tirar_novamente.pack(padx=50, pady=10, fill='x')
 
     if btn_sair is None:
-
-        btn_sair = ctk.CTkButton(app, text = "Sair do Programa", command = app.destroy)
-        btn_sair.pack(pady = 15)
+        btn_sair = ctk.CTkButton(app, text="Sair do Programa", command=app.destroy)
+        btn_sair.pack(pady=15)
 
 def confirmar_salvar(image):
     file_path = filedialog.asksaveasfilename(defaultextension=".jpg", 
@@ -147,12 +146,18 @@ def abrir_janela_temporizador():
     janela_temporizador.title("Captura com Temporizador")
 
     # Label e Entry para intervalo do temporizador
-    temporizador_label = ctk.CTkLabel(janela_temporizador, text="Intervalo do Temporizador (segundos):")
+    temporizador_label = ctk.CTkLabel(janela_temporizador, text="Intervalo do Temporizador:") 
     temporizador_label.pack(pady=5)
 
     global temporizador_intervalo_entry
     temporizador_intervalo_entry = ctk.CTkEntry(janela_temporizador)
     temporizador_intervalo_entry.pack(pady=5)
+
+    # ComboBox para selecionar a unidade de tempo
+    global unidade_temporizador
+    unidade_temporizador = ctk.CTkComboBox(janela_temporizador, values=["Segundos", "Minutos", "Horas"])
+    unidade_temporizador.set("Segundos")  # Padrão é "Segundos"
+    unidade_temporizador.pack(pady=5)
 
     # Botão para iniciar captura de imagens
     btn_iniciar_captura = ctk.CTkButton(janela_temporizador, text="Iniciar Captura", command=iniciar_captura_temporizador)
@@ -172,13 +177,28 @@ def iniciar_captura_temporizador():
     escolher_pasta_salvar()  # Escolhe a pasta antes de iniciar a captura
     if not pasta_salvar:
         return  # Cancela a operação se o usuário não escolher a pasta
+
+    # Desabilitar o ComboBox durante a captura
+    unidade_temporizador.configure(state='disabled')
+
+    # Converte o intervalo para segundos
     intervalo = int(temporizador_intervalo_entry.get())
+    unidade = unidade_temporizador.get()
+
+    if unidade == "Minutos":
+        intervalo *= 60  # Converte minutos para segundos
+    elif unidade == "Horas":
+        intervalo *= 3600  # Converte horas para segundos
+
     threading.Thread(target=capturar_fotos_continuamente, args=(intervalo,)).start()
 
 def parar_captura_temporizador():
     global captura_ativa
     captura_ativa = False
     messagebox.showinfo("Captura Parada", "A captura de fotos foi parada.")
+
+    # Reabilitar o ComboBox ao parar a captura
+    unidade_temporizador.configure(state='normal')
 
 def escolher_pasta_salvar():
     global pasta_salvar
@@ -198,6 +218,7 @@ tentar_conectar_novamente()
 
 label_titulo = ctk.CTkLabel(app, text="Snap Link", font=("Consolas bold", 24))
 label_titulo.pack(padx=10, pady=10)
+
 
 # Botão para abrir a janela de captura com temporizador
 btn_temporizador = ctk.CTkButton(app, text="Captura com Temporizador", command=abrir_janela_temporizador)
