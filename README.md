@@ -15,14 +15,32 @@ SnapLink é uma aplicação Python que interage com um dispositivo Arduino e ESP
 - **Visualização na Interface**: A imagem capturada é exibida diretamente na tela principal, eliminando a necessidade de abrir uma nova janela.
 - **Salvamento com Carimbo de Data e Hora**: As imagens podem ser salvas no formato JPEG ou PNG, com um carimbo de data e hora no canto inferior direito.
 - **Controles Intuitivos**: Botões para salvar ou capturar novas imagens aparecem lado a lado na interface.
+- **Captura com Temporizador**: Permite que o usuário defina um intervalo para capturas automáticas, escolhendo a unidade de tempo (segundos, minutos ou horas).
+- **Agendar Captura**: Permite que o usuário agende uma captura para uma data e hora futuras, com suporte a formatação de data e hora.
+- **Interação com a Interface Gráfica**: A interface permite interação fácil e intuitiva, com feedback em tempo real sobre as operações realizadas.
 
 ## Tecnologias Utilizadas
 - **Arduino**: Plataforma de prototipagem eletrônica para controle de hardware.
 - **ESP32**: Microcontrolador com conectividade Wi-Fi e Bluetooth, usado para comunicação sem fio com o Arduino.
 - **Python**: Linguagem de programação utilizada para implementar a lógica da aplicação e a interface gráfica.
-- **Custom Tkinter**: Biblioteca para criar interfaces gráficas modernas e personalizáveis.
-- **Pillow (PIL)**: Biblioteca para manipulação de imagens, incluindo decodificação de base64 e adição de textos.
 
+### Bibliotecas (Python)
+- **`serial`**: Biblioteca para comunicação serial com dispositivos Arduino.
+- **`time`**: Módulo para manipulação de tempo e atrasos de execução.
+- **`base64`**: Biblioteca para codificação e decodificação de dados em formato base64.
+- **`tkinter`**: Biblioteca padrão para interfaces gráficas em Python.
+- **`PIL` (Pillow)**: Biblioteca para manipulação de imagens, incluindo decodificação de base64 e adição de textos.
+- **`customtkinter`**: Biblioteca para criar interfaces gráficas modernas e personalizáveis.
+- **`io`**: Módulo para manipulação de fluxos de entrada e saída, usado para lidar com dados binários de imagem.
+- **`datetime`**: Módulo para manipulação de datas e horas, utilizado para carimbar imagens.
+- **`threading`**: Módulo para criar e gerenciar threads, permitindo operações em paralelo.
+- **`os`**: Biblioteca para interações com o sistema operacional, como manipulação de diretórios.
+
+## Bibliotecas (Arduino)
+- **`esp_camera.h`**: Biblioteca para a interface da câmera com o ESP32, permitindo a captura de imagens.
+- **`Arduino.h`**: Biblioteca fundamental para todas as operações relacionadas ao Arduino.
+- **`base64.h`**: Biblioteca utilizada para manipulação de dados em formato base64 em projetos de Arduino.
+  
 ## Testes Unitários
 
 O projeto inclui testes unitários desenvolvidos com `unittest`, que cobrem as principais funcionalidades da aplicação, como:
@@ -47,9 +65,6 @@ python -m unittest test_snaplink.py
 ```
 
 Isso executará todos os testes presentes no arquivo `test_snaplink.py` e exibirá o status de sucesso ou falha de cada teste.
-
-## Contribuições
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou pull requests.
 
 ## Contato
 
