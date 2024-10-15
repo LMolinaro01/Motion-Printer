@@ -44,9 +44,9 @@ def mostrar_preview(image_data):
     
     image = Image.open(io.BytesIO(image_data))
     photo = ImageTk.PhotoImage(image)
-    
+
     if preview_label is None:
-        preview_label = ctk.CTkLabel(app, image=photo, text="") 
+        preview_label = ctk.CTkLabel(app, image=photo, text="")
         preview_label.image = photo
         preview_label.pack(padx=10, pady=10)
     else:
@@ -55,15 +55,15 @@ def mostrar_preview(image_data):
 
     if btn_salvar is None:
         btn_salvar = ctk.CTkButton(app, text="Salvar Imagem", command=lambda: confirmar_salvar(image))
-        btn_salvar.pack(padx=50, pady=10, fill='x')
+        btn_salvar.pack(padx=100, pady=10, fill='x')  
 
     if btn_tirar_novamente is None:
         btn_tirar_novamente = ctk.CTkButton(app, text="Tirar Novamente", command=tirar_foto_unica)
-        btn_tirar_novamente.pack(padx=50, pady=10, fill='x')
+        btn_tirar_novamente.pack(padx=100, pady=10, fill='x')  
 
     if btn_sair is None:
         btn_sair = ctk.CTkButton(app, text="Sair do Programa", command=app.destroy)
-        btn_sair.pack(pady=15)
+        btn_sair.pack(pady=15)  
 
 def confirmar_salvar(image):
     file_path = filedialog.asksaveasfilename(defaultextension=".jpg", 
@@ -201,7 +201,7 @@ def escolher_pasta_salvar():
 def abrir_janela_agendar_captura():
     global janela_agendar
     janela_agendar = ctk.CTkToplevel(app)
-    janela_agendar.geometry("400x350")
+    janela_agendar.geometry("450x500")
     janela_agendar.title("Agendar Captura")
 
     data_label = ctk.CTkLabel(janela_agendar, text="Data (DD/MM/AAAA):") 
@@ -285,22 +285,22 @@ def start_timer(tempo):
         while tempo > 0:
             if tempo >= 2592000:  
                 meses = tempo // 2592000  
-                temporizador_label.configure(text=f"Tempo até a captura: {meses} mês(es)")
+                temporizador_label.configure(text=f"{meses} mês(es)")
                 time.sleep(3600)  
             elif tempo >= 86400:  
                 dias = tempo // 86400
-                temporizador_label.configure(text=f"Tempo até a captura: {dias} dia(s)")
+                temporizador_label.configure(text=f"{dias} dia(s)")
                 time.sleep(3600)  
             elif tempo >= 3600:  
                 horas, mins = divmod(tempo, 3600)
-                temporizador_label.configure(text=f"Tempo até a captura: {horas} hora(s) {mins // 60} minuto(s)")
+                temporizador_label.configure(text=f"{horas} hora(s) {mins // 60} minuto(s)")
                 time.sleep(60)  
             elif tempo >= 60:  
                 mins, secs = divmod(tempo, 60)
-                temporizador_label.configure(text=f"Tempo até a captura: {mins} minuto(s) {secs} segundo(s)")
+                temporizador_label.configure(text=f"{mins} minuto(s) {secs} segundo(s)")
                 time.sleep(1) 
             else:
-                temporizador_label.configure(text=f"Tempo até a captura: {tempo} segundo(s)")
+                temporizador_label.configure(text=f"{int(tempo)} segundo(s)")  
                 time.sleep(1)  
             
             tempo -= 1  
@@ -324,7 +324,7 @@ def finalizar_agendamento():
 def iniciar_captura_agendada():
     global captura_ativa
     if captura_ativa:
-        for _ in range(7):  
+        for _ in range(10):  
             image_data = tirar_foto()
             if image_data:
                 image = Image.open(io.BytesIO(image_data))
@@ -335,21 +335,24 @@ ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
 
 app = ctk.CTk()
-app.geometry("500x700")
+app.geometry("600x700")
 app.title("SnapLink")
 
 tentar_conectar_novamente()
 
 label_titulo = ctk.CTkLabel(app, text="Snap Link", font=("Consolas bold", 24))
-label_titulo.pack(padx=10, pady=10)
-
-btn_temporizador = ctk.CTkButton(app, text="Captura com Temporizador", command=abrir_janela_temporizador)
-btn_temporizador.pack(padx=50, pady=10, fill='x')
-
-btn_agendar = ctk.CTkButton(app, text="Agendar Captura", command=abrir_janela_agendar_captura)
-btn_agendar.pack(padx=50, pady=10, fill='x')
+label_titulo.pack(padx=10, pady=30)
 
 btn_capturar = ctk.CTkButton(app, text="Capturar Imagem", command=tirar_foto_unica)
 btn_capturar.pack(padx=50, pady=10, fill='x')
+
+frame_botao = ctk.CTkFrame(app)
+frame_botao.pack(pady=10)
+
+btn_agendar = ctk.CTkButton(frame_botao, text="Agendar Captura", command=abrir_janela_agendar_captura)
+btn_agendar.pack(side='left', padx=10) 
+
+btn_temporizador = ctk.CTkButton(frame_botao, text="Captura com Temporizador", command=abrir_janela_temporizador)
+btn_temporizador.pack(side='left', padx=10)
 
 app.mainloop()
