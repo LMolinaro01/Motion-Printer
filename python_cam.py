@@ -221,6 +221,7 @@ def abrir_janela_agendar_captura():
     global data_entry
     data_entry = ctk.CTkEntry(janela_agendar)
     data_entry.pack(pady=5)
+    data_entry.bind("<KeyRelease>", formatar_data)  # Formatação automática de data
 
     hora_label = ctk.CTkLabel(janela_agendar, text="Hora (HH:MM):") 
     hora_label.pack(pady=5)
@@ -228,14 +229,26 @@ def abrir_janela_agendar_captura():
     global hora_entry
     hora_entry = ctk.CTkEntry(janela_agendar)
     hora_entry.pack(pady=5)
+    hora_entry.bind("<KeyRelease>", formatar_hora)  # Formatação automática de hora
 
     # Botão para confirmar agendamento
-    btn_confirmar = ctk.CTkButton(janela_agendar, text="Confirmar Agendamento", command=confirmar_agendamento)
-    btn_confirmar.pack(pady=10)
+    global btn_agendar
+    btn_agendar = ctk.CTkButton(janela_agendar, text="Confirmar Agendamento", command=confirmar_agendamento)
+    btn_agendar.pack(pady=10)
 
     # Botão para voltar para a janela principal
     btn_voltar = ctk.CTkButton(janela_agendar, text="Voltar", command=janela_agendar.destroy)
     btn_voltar.pack(pady=5)
+
+def formatar_data(event):
+    text = data_entry.get()
+    if len(text) == 2 or len(text) == 5:
+        data_entry.insert(len(text), "/")  # Adiciona "/" após dia e mês
+
+def formatar_hora(event):
+    text = hora_entry.get()
+    if len(text) == 2:
+        hora_entry.insert(len(text), ":")  # Adiciona ":" após horas
 
 def confirmar_agendamento():
     global captura_ativa, timer_thread
@@ -262,7 +275,7 @@ def confirmar_agendamento():
         tempo_ate_agendamento = (data_hora - agora).total_seconds()
 
         # Desabilitar botões e entradas durante o agendamento
-        btn_agendar.configure(state='disabled')
+        btn_agendar.configure(state='disabled')  # Desabilitar o botão após confirmar
         data_entry.configure(state='disabled')
         hora_entry.configure(state='disabled')
 
@@ -288,7 +301,7 @@ def start_timer(tempo):
             time.sleep(1)
             tempo -= 1
 
-        temporizador_label.configure(text="Captura em andamento...")
+        temporizador_label.configure(text="Captura em Andamento...")
         finalizar_agendamento()
 
     timer_thread = threading.Thread(target=update_timer)
