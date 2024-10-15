@@ -1,11 +1,11 @@
 
 <h1 align = "center"> Snap Link </h1>
 
-![image](https://github.com/user-attachments/assets/5113eead-7c4e-4030-9f4b-7d13d71572a8)
+![{E4A940DA-8117-42A2-9D5A-A0B8C86AC63A}](https://github.com/user-attachments/assets/35107e40-9f5a-4660-b6cc-1246fae79de3)
 
 ## Descrição
 
-![{63D0C23D-0851-40FC-BB03-83190D6D6AE9}](https://github.com/user-attachments/assets/2e4c69b2-f517-4b91-beef-0cd1013dace4)
+![image](https://github.com/user-attachments/assets/5113eead-7c4e-4030-9f4b-7d13d71572a8)
 
 SnapLink é uma aplicação Python que interage com um dispositivo Arduino e ESP32, permitindo a captura, visualização e salvamento de imagens com um carimbo de data e hora. A aplicação foi desenvolvida com uma interface gráfica moderna usando a biblioteca Custom Tkinter, proporcionando uma experiência de usuário intuitiva.
 
