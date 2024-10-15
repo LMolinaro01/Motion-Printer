@@ -8,9 +8,9 @@ import io
 from datetime import datetime
 
 ser = None
-preview_label = None  # Label global para o preview
-btn_salvar = None     # Botão global para salvar a imagem
-btn_tirar_novamente = None  # Botão global para tirar outra foto
+preview_label = None 
+btn_salvar = None   
+btn_tirar_novamente = None
 
 def conectar_arduino():
     global ser
@@ -39,7 +39,7 @@ def mostrar_preview(image_data):
     photo = ImageTk.PhotoImage(image)
     
     if preview_label is None:
-        preview_label = ctk.CTkLabel(app, image=photo, text="")  # Cria o label no app principal
+        preview_label = ctk.CTkLabel(app, image=photo, text="") 
         preview_label.image = photo
         preview_label.pack(padx=10, pady=10)
     else:
@@ -116,6 +116,6 @@ label_titulo = ctk.CTkLabel(app, text="Snap Link", font=("Consolas bold", 24))
 label_titulo.pack(padx=10, pady=10)
 
 btn_capturar = ctk.CTkButton(app, text="Capturar Imagem", command=tirar_foto)
-btn_capturar.pack(pady=20, padx=20, fill='x')
+btn_capturar.pack(pady=20, padx=50, fill='x')
 
 app.mainloop()
