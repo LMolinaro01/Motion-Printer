@@ -15,8 +15,19 @@ def conectar_arduino():
         ser = serial.Serial('COM7', 115200)
         time.sleep(2)
         messagebox.showinfo("Conexão", "Conexão com Arduino estabelecida!")
+        return True
     except Exception as e:
-        messagebox.showerror("Erro", f"Erro ao conectar com o Arduino: {e}")
+        return False
+
+def tentar_conectar_novamente():
+    if conectar_arduino():
+        return
+    else:
+        retry = messagebox.askretrycancel("Erro de Conexão", "Erro ao conectar com o Arduino. Deseja tentar novamente?")
+        if retry:
+            tentar_conectar_novamente()
+        else:
+            app.quit()
 
 def mostrar_preview(image_data):
     preview_window = Toplevel(app)
@@ -30,8 +41,7 @@ def mostrar_preview(image_data):
     label.pack(padx=10, pady=10)
     
     def confirmar_salvar():
-        file_path = filedialog.asksaveasfilename(defaultextension=".jpg", 
-                                                 filetypes=[("JPEG files", "*.jpg"), ("PNG files", "*.png")])
+        file_path = filedialog.asksaveasfilename(defaultextension=".jpg", filetypes=[("JPEG files", "*.jpg"), ("PNG files", "*.png")])
         if file_path:
             adicionar_data_hora(image)
             image.save(file_path)
@@ -92,13 +102,16 @@ ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
 
 app = ctk.CTk()
-app.geometry("300x200")
-app.title("Interface Arduino - Captura de Imagem")
+app.geometry("500x400")
+app.title("SnapLink")
 
-btn_conectar = ctk.CTkButton(app, text="Conectar Arduino", command=conectar_arduino)
-btn_conectar.pack(pady=20)
+tentar_conectar_novamente()
+
+label_titulo = ctk.CTkLabel(app, text="Snap Link", font=("Consolas bold", 24))
+label_titulo.pack(padx=10, pady=10)
 
 btn_capturar = ctk.CTkButton(app, text="Capturar Imagem", command=tirar_foto)
-btn_capturar.pack(pady=20)
+btn_capturar.pack(pady=20, padx=20, fill='x')
 
 app.mainloop()
+
