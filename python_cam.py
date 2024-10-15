@@ -6,10 +6,14 @@ from PIL import Image, ImageTk, ImageDraw, ImageFont
 import customtkinter as ctk
 import io
 from datetime import datetime
+import threading
+import os
 
 ser = None
-preview_label = None 
-btn_salvar = None   
+captura_ativa = False  # Controla se a captura está ativa
+pasta_salvar = ""  # Pasta onde as imagens serão salvas
+preview_label = None
+btn_salvar = None
 btn_tirar_novamente = None
 
 def conectar_arduino():
@@ -48,11 +52,11 @@ def mostrar_preview(image_data):
 
     if btn_salvar is None:
         btn_salvar = ctk.CTkButton(app, text="Salvar Imagem", command=lambda: confirmar_salvar(image))
-        btn_salvar.pack(padx = 50, pady=10, fill='x')
+        btn_salvar.pack(padx=50, pady=10, fill='x')
 
     if btn_tirar_novamente is None:
-        btn_tirar_novamente = ctk.CTkButton(app, text="Tirar Novamente", command=tirar_foto)
-        btn_tirar_novamente.pack(padx = 50, pady=10, fill='x')
+        btn_tirar_novamente = ctk.CTkButton(app, text="Tirar Novamente", command=tirar_foto_unica)
+        btn_tirar_novamente.pack(padx=50, pady=10, fill='x')
 
 def confirmar_salvar(image):
     file_path = filedialog.asksaveasfilename(defaultextension=".jpg", 
@@ -81,8 +85,8 @@ def tirar_foto():
     global ser
     if ser and ser.is_open:
         try:
-            ser.write(b't')
-            time.sleep(1)
+            ser.write(b't')  # Envia o comando para o Arduino tirar a foto
+            time.sleep(1)  # Ajuste no tempo para garantir que a imagem seja recebida
             
             base64_data = ""
             while True:
@@ -96,13 +100,87 @@ def tirar_foto():
             
             print("Imagem em Base64 recebida.")
             image_data = base64.b64decode(base64_data)
-            mostrar_preview(image_data)
+            return image_data
 
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao capturar imagem: {e}")
     else:
         messagebox.showerror("Erro", "Arduino não conectado.")
+    return None
 
+def tirar_foto_unica():
+    image_data = tirar_foto()
+    if image_data:
+        mostrar_preview(image_data)
+
+def capturar_fotos_continuamente(intervalo):
+    global captura_ativa
+    while captura_ativa:
+        image_data = tirar_foto()
+        if image_data:
+            image = Image.open(io.BytesIO(image_data))
+            salvar_automatico(image)
+        time.sleep(intervalo)  # Intervalo entre cada foto
+
+def salvar_automatico(image):
+    global pasta_salvar
+    # Gera o nome do arquivo baseado na data e hora
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    file_name = f"foto_{timestamp}.jpg"
+    file_path = os.path.join(pasta_salvar, file_name)
+
+    # Adiciona data e hora na imagem e salva automaticamente
+    adicionar_data_hora(image)
+    image.save(file_path)
+    print(f"Imagem salva automaticamente em: {file_path}")
+
+def abrir_janela_temporizador():
+    global janela_temporizador
+    janela_temporizador = ctk.CTkToplevel(app)
+    janela_temporizador.geometry("400x300")
+    janela_temporizador.title("Captura com Temporizador")
+
+    # Label e Entry para intervalo do temporizador
+    temporizador_label = ctk.CTkLabel(janela_temporizador, text="Intervalo do Temporizador (segundos):")
+    temporizador_label.pack(pady=5)
+
+    global temporizador_intervalo_entry
+    temporizador_intervalo_entry = ctk.CTkEntry(janela_temporizador)
+    temporizador_intervalo_entry.pack(pady=5)
+
+    # Botão para iniciar captura de imagens
+    btn_iniciar_captura = ctk.CTkButton(janela_temporizador, text="Iniciar Captura", command=iniciar_captura_temporizador)
+    btn_iniciar_captura.pack(padx=50, pady=10, fill='x')
+
+    # Botão para parar captura de imagens
+    btn_parar_captura = ctk.CTkButton(janela_temporizador, text="Parar Captura", command=parar_captura_temporizador)
+    btn_parar_captura.pack(padx=50, pady=10, fill='x')
+
+    # Botão para voltar para a janela principal
+    btn_voltar = ctk.CTkButton(janela_temporizador, text="Voltar", command=janela_temporizador.destroy)
+    btn_voltar.pack(padx=50, pady=10, fill='x')
+
+def iniciar_captura_temporizador():
+    global captura_ativa
+    captura_ativa = True
+    escolher_pasta_salvar()  # Escolhe a pasta antes de iniciar a captura
+    if not pasta_salvar:
+        return  # Cancela a operação se o usuário não escolher a pasta
+    intervalo = int(temporizador_intervalo_entry.get())
+    threading.Thread(target=capturar_fotos_continuamente, args=(intervalo,)).start()
+
+def parar_captura_temporizador():
+    global captura_ativa
+    captura_ativa = False
+    messagebox.showinfo("Captura Parada", "A captura de fotos foi parada.")
+
+def escolher_pasta_salvar():
+    global pasta_salvar
+    pasta_salvar = filedialog.askdirectory()
+    if not pasta_salvar:
+        messagebox.showwarning("Nenhuma pasta", "Você não selecionou nenhuma pasta. As fotos não serão salvas automaticamente.")
+
+# Janela principal
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
 
@@ -115,7 +193,12 @@ tentar_conectar_novamente()
 label_titulo = ctk.CTkLabel(app, text="Snap Link", font=("Consolas bold", 24))
 label_titulo.pack(padx=10, pady=10)
 
-btn_capturar = ctk.CTkButton(app, text="Capturar Imagem", command=tirar_foto)
-btn_capturar.pack(pady=20, padx=50, fill='x')
+# Botão para abrir a janela de captura com temporizador
+btn_temporizador = ctk.CTkButton(app, text="Captura com Temporizador", command=abrir_janela_temporizador)
+btn_temporizador.pack(padx=50, pady=10, fill='x')
+
+# Botão para capturar uma foto única
+btn_capturar = ctk.CTkButton(app, text="Capturar Imagem", command=tirar_foto_unica)
+btn_capturar.pack(padx=50, pady=10, fill='x')
 
 app.mainloop()
