@@ -36,12 +36,13 @@ def mostrar_preview(image_data):
     image = Image.open(io.BytesIO(image_data))
     photo = ImageTk.PhotoImage(image)
     
-    label = ctk.CTkLabel(preview_window, image=photo)
+    label = ctk.CTkLabel(preview_window, image=photo, text="")
     label.image = photo
     label.pack(padx=10, pady=10)
     
     def confirmar_salvar():
-        file_path = filedialog.asksaveasfilename(defaultextension=".jpg", filetypes=[("JPEG files", "*.jpg"), ("PNG files", "*.png")])
+        file_path = filedialog.asksaveasfilename(defaultextension=".jpg", 
+                                                 filetypes=[("JPEG files", "*.jpg"), ("PNG files", "*.png")])
         if file_path:
             adicionar_data_hora(image)
             image.save(file_path)
@@ -59,6 +60,7 @@ def mostrar_preview(image_data):
 
     btn_tirar_novamente = ctk.CTkButton(preview_window, text="Tirar Novamente", command=tirar_novamente)
     btn_tirar_novamente.pack(side='right', padx=20, pady=10)
+
 
 def adicionar_data_hora(image):
     draw = ImageDraw.Draw(image)
