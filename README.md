@@ -9,7 +9,7 @@ SnapLink é uma aplicação Python que interage com um dispositivo Arduino e ESP
 ## Exibição (Youtube)
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=d6Is6V5wG5Q" target = "_blank">
+  <a href="https://www.youtube.com/watch?v=gqIQ7TYz2Yg" target = "_blank">
     <img src="https://github.com/user-attachments/assets/c50fca0a-8bef-4ee0-b46a-fd13cc293756", width= 720px>
   </a>
 </p>
